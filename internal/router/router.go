@@ -17,13 +17,17 @@ func InitRouter() error {
 	if env.ENV == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	router := gin.Default()
+	r := gin.Default()
 
-	logger.Info("registering routes...")
-	registerRoutes(router)
-	logger.Info("routes registered")
+	apiGroup := r.Group("/api")
+	registerApiRoutes(apiGroup)
 
+	r.Static("/assets", "./web/dist/assets")
+	// Servir index.html para as demais rotas
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./web/dist/index.html")
+	})
 	logger.Info("starting server...")
-	router.Run(fmt.Sprintf(":%s", env.PORT))
+	r.Run(fmt.Sprintf(":%s", "8080"))
 	return nil
 }

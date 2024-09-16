@@ -1,12 +1,10 @@
 package config
 
 import (
-	"errors"
 	"os"
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 )
 
 type Env struct {
@@ -30,24 +28,18 @@ func getEnvAsInt(key string, defaultValue int) int {
 
 func loadEnv() (*Env, error) {
 	logger := GetLogger("Env")
-	logger.Info("loading .env file...")
-	err := godotenv.Load()
+	logger.Info("loading env vars...")
 
-	if err != nil {
-		logger.Errorf("error loading .env file: %s", err.Error())
-		return nil, errors.New("error loading .env file")
-	}
 	envVars := Env{
 		ENV:  getEnv("ENV", "development"),
 		PORT: getEnv("PORT", "8080"),
 	}
-
 	envValidator := validator.New()
-	err = envValidator.Struct(envVars)
+	err := envValidator.Struct(envVars)
 	if err != nil {
 		logger.Errorf("error validating .env file: %s", err.Error())
 		return nil, err
 	}
-	logger.Info(".env file loaded")
+	logger.Info("env vars loaded")
 	return &envVars, nil
 }
